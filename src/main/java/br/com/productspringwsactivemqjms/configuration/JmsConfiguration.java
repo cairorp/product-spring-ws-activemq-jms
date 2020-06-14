@@ -1,18 +1,14 @@
 package br.com.productspringwsactivemqjms.configuration;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.annotation.EnableJms;
-import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 
-@SuppressWarnings("ALL")
-@EnableJms
+import javax.jms.Queue;
+
 @Configuration
 public class JmsConfiguration {
 
@@ -28,32 +24,18 @@ public class JmsConfiguration {
         this.password = password;
     }
 
-
-    @Bean
-    @SuppressWarnings("jmsListenerContainerFactory")
-    public JmsListenerContainerFactory jmsListenerContainerFactory(DefaultJmsListenerContainerFactoryConfigurer configurer) {
-
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        configurer.configure(factory, activeMQConnectionFactory());
-        factory.setPubSubDomain(true);
-
-        return factory;
-    }
-
     @Bean
     public JmsTemplate jmsTemplate() {
         return new JmsTemplate(activeMQConnectionFactory());
     }
 
     @Bean
-    public JmsTemplate jmsTemplateTopic() {
-        JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
-        jmsTemplate.setPubSubDomain(true);
-
-        return jmsTemplate;
+    public Queue productQueue() {
+        return new ActiveMQQueue("queue.product");
     }
 
-    private ActiveMQConnectionFactory activeMQConnectionFactory() {
+    @Bean
+    public ActiveMQConnectionFactory activeMQConnectionFactory() {
         return user.isEmpty() ?
                 new ActiveMQConnectionFactory(brokerUrl) :
                 new ActiveMQConnectionFactory(user, password, brokerUrl);

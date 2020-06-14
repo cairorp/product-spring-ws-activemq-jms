@@ -1,6 +1,6 @@
 package br.com.productspringwsactivemqjms.service.impl;
 
-import br.com.productspringwsactivemqjms.client.ProductClient;
+import br.com.productspringwsactivemqjms.producer.ProductProducer;
 import br.com.productspringwsactivemqjms.dto.ProductDto;
 import br.com.productspringwsactivemqjms.exception.ProductException;
 import br.com.productspringwsactivemqjms.exception.QueueException;
@@ -13,18 +13,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductClient productClient;
+    private ProductProducer productProducer;
     private ProductRepository productRepository;
 
-    public ProductServiceImpl(ProductClient productClient, ProductRepository productRepository) {
-        this.productClient = productClient;
+    public ProductServiceImpl(ProductProducer productProducer, ProductRepository productRepository) {
+        this.productProducer = productProducer;
         this.productRepository = productRepository;
     }
 
     @Override
     public ResponseEntity<Void> addInQueue(ProductDto product) {
         try {
-            productClient.add(product);
+            productProducer.add(product);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }catch (Exception ex){
             throw new QueueException(">>>>>> AN ERROR OCCURRED WHEN TRYING TO ADD THE PRODUCT TO THE QUEUE.");
